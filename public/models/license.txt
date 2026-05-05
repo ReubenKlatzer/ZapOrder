@@ -1,0 +1,11 @@
+Model Information:
+* title:	Low Poly Burger (Be Healthy)
+* source:	https://sketchfab.com/3d-models/low-poly-burger-be-healthy-814452933c97433aafab79729d17e5c2
+* author:	Blender Studio™ (https://sketchfab.com/Blend_GUY)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Low Poly Burger (Be Healthy)" (https://sketchfab.com/3d-models/low-poly-burger-be-healthy-814452933c97433aafab79729d17e5c2) by Blender Studio™ (https://sketchfab.com/Blend_GUY) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

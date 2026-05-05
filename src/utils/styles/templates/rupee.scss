@@ -1,0 +1,10 @@
+.rupee {
+	&::before {
+		content: 'R';
+		user-select: none;
+		margin-right: 2px;
+		font-weight: 700;
+		font-family: Arial, sans-serif;
+		font-variation-settings: normal;
+	}
+}

@@ -1,0 +1,161 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Account {
+  id                 String    @id @default(cuid())
+  username           String    @unique
+  email              String    @unique
+  password           String
+  verified           Boolean   @default(false)
+  accountActive      Boolean   @default(true)
+  subscriptionActive Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  aiApiKey           String?
+  aiModel            String?
+  aiProvider         String?   @default("groq")
+  aiName             String?   @default("ZapOder")
+  kitchens           Kitchen[]
+  menus              Menu[]
+  profile            Profile?
+  tables             Table[]
+
+  @@map("accounts")
+}
+
+model Profile {
+  id           String   @id @default(cuid())
+  name         String
+  restaurantID String   @unique
+  description  String?
+  address      String?
+  avatar       String?
+  cover        String?
+  photos       String[]
+  gstInclusive Boolean  @default(false)
+  categories   String[]
+  themeH       Float?
+  themeS       Float?
+  themeL       Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  account      Account  @relation(fields: [restaurantID], references: [username])
+
+  @@map("profiles")
+}
+
+model Kitchen {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  password     String
+  restaurantID String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  account      Account  @relation(fields: [restaurantID], references: [username])
+
+  @@map("kitchens")
+}
+
+model Table {
+  id           String   @id @default(cuid())
+  name         String
+  username     String
+  restaurantID String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  account      Account  @relation(fields: [restaurantID], references: [username])
+
+  @@unique([username, restaurantID])
+  @@map("tables")
+}
+
+model Menu {
+  id            String         @id @default(cuid())
+  name          String
+  restaurantID  String
+  description   String?
+  category      String?
+  price         Float
+  taxPercent    Float          @default(0)
+  foodType      String?
+  veg           String
+  image         String?
+  hidden        Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  account       Account        @relation(fields: [restaurantID], references: [username])
+  orderProducts OrderProduct[]
+
+  @@map("menus")
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  fname     String
+  lname     String
+  phone     String   @unique
+  email     String?  @unique
+  gender    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@map("customers")
+}
+
+model Order {
+  id           String         @id @default(cuid())
+  restaurantID String
+  table        String
+  state        String         @default("active")
+  orderTotal   Float          @default(0)
+  taxTotal     Float          @default(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  customerId   String
+  products     OrderProduct[]
+  customer     Customer       @relation(fields: [customerId], references: [id])
+
+  @@map("orders")
+}
+
+model OrderProduct {
+  id            String  @id @default(cuid())
+  quantity      Int     @default(1)
+  price         Float
+  tax           Float
+  adminApproved Boolean @default(false)
+  fulfilled     Boolean @default(false)
+  orderId       String
+  menuId        String
+  menu          Menu    @relation(fields: [menuId], references: [id])
+  order         Order   @relation(fields: [orderId], references: [id])
+
+  @@map("order_products")
+}
+
+model AIConfig {
+  id                 String   @id @default(cuid())
+  exhaustedProviders String[]
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("ai_configs")
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  restaurantID String
+  customerName String
+  rating       Int
+  comment      String?
+  createdAt    DateTime @default(now())
+
+  @@map("reviews")
+}

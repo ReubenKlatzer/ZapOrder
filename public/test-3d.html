@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Viewer Test</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        model-viewer {
+            width: 100%;
+            height: 400px;
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🥽 3D Viewer Diagnostic Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Library Loading</h2>
+        <div id="test1" class="status info">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Basic Model Viewer</h2>
+        <div id="test2" class="status info">Click button below to test</div>
+        <button onclick="testBasicViewer()" style="padding: 10px 20px; margin: 10px 0;">Load Test Model</button>
+        <div id="viewer-container"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Your Menu Item</h2>
+        <div id="test3" class="status info">Enter menu item name</div>
+        <input type="text" id="itemName" placeholder="e.g., Boerewors Roll" style="padding: 10px; width: 300px;">
+        <button onclick="testMenuItem()" style="padding: 10px 20px; margin: 10px;">Test Item</button>
+        <div id="item-viewer-container"></div>
+    </div>
+
+    <script>
+        // Test 1: Check if model-viewer loads
+        setTimeout(() => {
+            const test1 = document.getElementById('test1');
+            if (customElements.get('model-viewer')) {
+                test1.className = 'status success';
+                test1.textContent = '✅ model-viewer library loaded successfully!';
+            } else {
+                test1.className = 'status error';
+                test1.textContent = '❌ model-viewer library failed to load';
+            }
+        }, 2000);
+
+        // Test 2: Load a test model from CDN
+        function testBasicViewer() {
+            const container = document.getElementById('viewer-container');
+            const test2 = document.getElementById('test2');
+            
+            container.innerHTML = `
+                <model-viewer
+                    src="https://modelviewer.dev/shared-assets/models/Astronaut.glb"
+                    alt="Test astronaut model"
+                    camera-controls
+                    auto-rotate
+                    style="width: 100%; height: 400px; background: #f0f0f0;">
+                </model-viewer>
+            `;
+            
+            const viewer = container.querySelector('model-viewer');
+            viewer.addEventListener('load', () => {
+                test2.className = 'status success';
+                test2.textContent = '✅ Test model loaded! You should see a rotating astronaut.';
+            });
+            viewer.addEventListener('error', (e) => {
+                test2.className = 'status error';
+                test2.textContent = '❌ Failed to load test model: ' + e.message;
+            });
+        }
+
+        // Test 3: Test your menu item
+        function testMenuItem() {
+            const itemName = document.getElementById('itemName').value;
+            if (!itemName) {
+                alert('Please enter a menu item name');
+                return;
+            }
+
+            const container = document.getElementById('item-viewer-container');
+            const test3 = document.getElementById('test3');
+            
+            const fileName = itemName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+            const modelPath = `/models/${fileName}.glb`;
+            
+            test3.className = 'status info';
+            test3.textContent = `🔍 Looking for: ${modelPath}`;
+            
+            container.innerHTML = `
+                <model-viewer
+                    src="${modelPath}"
+                    alt="${itemName}"
+                    camera-controls
+                    auto-rotate
+                    style="width: 100%; height: 400px; background: #f0f0f0;">
+                </model-viewer>
+            `;
+            
+            const viewer = container.querySelector('model-viewer');
+            viewer.addEventListener('load', () => {
+                test3.className = 'status success';
+                test3.textContent = `✅ Found model: ${modelPath}`;
+            });
+            viewer.addEventListener('error', () => {
+                test3.className = 'status error';
+                test3.textContent = `❌ Model not found: ${modelPath}\n\nThis is normal if you haven't added the model yet. The app will show the product image instead.`;
+            });
+        }
+    </script>
+</body>
+</html>

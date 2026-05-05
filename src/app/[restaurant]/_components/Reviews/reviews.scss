@@ -1,0 +1,157 @@
+.reviewsPage {
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	padding: 30px 20px 80px;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+
+	.reviewsHeader {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 12px;
+
+		.reviewsTitle {
+			font-size: 28px;
+			font-variation-settings: 'wdth' 75, 'wght' 300;
+			color: var(--colorContentPrimary);
+			margin: 0;
+		}
+
+		.reviewsAvg {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+
+			.avgScore {
+				font-size: 32px;
+				font-variation-settings: 'wght' 700;
+				color: var(--colorContentPrimary);
+			}
+
+			.reviewCount {
+				font-size: 13px;
+				color: var(--colorContentSecondary);
+			}
+		}
+	}
+
+	.reviewForm {
+		background: var(--colorBackgroundSecondary);
+		border-radius: 16px;
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+
+		h3 {
+			margin: 0;
+			font-size: 16px;
+			color: var(--colorContentPrimary);
+		}
+
+		.ratingRow {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+
+			span {
+				font-size: 14px;
+				color: var(--colorContentSecondary);
+			}
+		}
+	}
+
+	.reviewsList {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+
+		.noReviews {
+			text-align: center;
+			color: var(--colorContentSecondary);
+			padding: 40px 0;
+		}
+
+		.reviewCard {
+			background: var(--colorBackgroundSecondary);
+			border-radius: 16px;
+			padding: 16px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+
+			.reviewCardHeader {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+
+				.reviewerInfo {
+					display: flex;
+					align-items: center;
+					gap: 10px;
+
+					.reviewerAvatar {
+						width: 38px;
+						height: 38px;
+						border-radius: 50%;
+						background: hsl(var(--colorBrandPrimary));
+						color: white;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						font-size: 16px;
+						font-variation-settings: 'wght' 700;
+						flex-shrink: 0;
+					}
+
+					.reviewerName {
+						margin: 0;
+						font-size: 14px;
+						font-variation-settings: 'wght' 600;
+						color: var(--colorContentPrimary);
+					}
+
+					.reviewDate {
+						margin: 0;
+						font-size: 11px;
+						color: var(--colorContentSecondary);
+					}
+				}
+			}
+
+			.reviewComment {
+				margin: 0;
+				font-size: 13px;
+				color: var(--colorContentSecondary);
+				line-height: 1.5;
+			}
+		}
+	}
+}
+
+.starRating {
+	display: flex;
+	gap: 2px;
+
+	.star {
+		font-size: 20px;
+		color: var(--colorContentTertiary);
+		transition: color 0.15s;
+
+		&.filled {
+			color: #f5a623;
+		}
+
+		&.interactive {
+			cursor: pointer;
+
+			&:hover {
+				color: #f5a623;
+			}
+		}
+	}
+}

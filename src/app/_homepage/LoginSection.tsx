@@ -1,0 +1,216 @@
+import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import type { ChangeEvent } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { Avatar, Button, Lottie, Textfield, useXTheme } from "xtreme-ui";
+
+import { useAdmin } from "#components/context/useContext";
+import { DEFAULT_THEME_COLOR, getAnimSrc } from "#utils/constants/common";
+import type { TProfile } from "#utils/database/models/profile";
+
+import "./loginSection.scss";
+
+const LoginSection = () => {
+	const { setThemeColor } = useXTheme();
+	const router = useRouter();
+	const session = useSession();
+	const { profile: dashboard, profileLoading } = useAdmin();
+	const loggedIn = session.status === "authenticated";
+
+	const [logoutLoading, setLogoutLoading] = useState(false);
+	const [isRegister, setIsRegister] = useState(false);
+	const [profile, setProfile] = useState<TProfile>();
+	const [nextLoading, setNextLoading] = useState(false);
+
+	const [email, setEmail] = useState("");
+	const [emailShake, setEmailShake] = useState(false);
+
+	const [kitchenUsername, setKitchenUsername] = useState("");
+	const [showKitchen, setShowKitchen] = useState(false);
+
+	const [password, setPassword] = useState("");
+	const [passwordShake, setPasswordShake] = useState(false);
+
+	// Register fields
+	const [regName, setRegName] = useState("");
+	const [regUsername, setRegUsername] = useState("");
+	const [regEmail, setRegEmail] = useState("");
+	const [regPassword, setRegPassword] = useState("");
+
+	const onRegister = async () => {
+		setNextLoading(true);
+		const res = await fetch("/api/auth/register", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ name: regName, username: regUsername, email: regEmail, password: regPassword }),
+		});
+		const data = await res.json();
+		if (!res.ok) {
+			toast.error(data?.message);
+		} else {
+			toast.success("Restaurant registered! Please log in.");
+			setIsRegister(false);
+			setEmail(regEmail);
+		}
+		setNextLoading(false);
+	};
+
+	const onNext = async () => {
+		setNextLoading(true);
+		if (!profile) {
+			const res = await fetch(`/api/baseProfile?email=${email}`);
+			const profile = await res.json();
+
+			if (profile.status === 404) {
+				toast.error("Account does not exist!");
+				setEmailShake(true);
+				setTimeout(() => setEmailShake(false), 600);
+			} else {
+				setProfile(profile);
+			}
+		} else {
+			const res = await signIn("restaurant", {
+				redirect: false,
+				username: email,
+				...(showKitchen && { kitchen: kitchenUsername }),
+				password,
+				callbackUrl: `${window.location.origin}`,
+			});
+
+			if (res?.error) {
+				toast.error(res?.error);
+				setPassword("");
+				setPasswordShake(true);
+				setTimeout(() => setPasswordShake(false), 600);
+				return setNextLoading(false);
+			}
+
+			if (kitchenUsername) router.push("/kitchen");
+			else { setShowKitchen(false); router.push("/dashboard"); }
+		}
+		setNextLoading(false);
+	};
+	const logout = () => {
+		setThemeColor(DEFAULT_THEME_COLOR);
+		if (!loggedIn) return setProfile(undefined);
+		setLogoutLoading(true);
+		router.push("/logout");
+	};
+
+	useEffect(() => {
+		const newColor = profile?.themeColor ?? dashboard?.themeColor;
+		if (newColor) setThemeColor(profile?.themeColor ?? dashboard?.themeColor);
+	}, [profile, dashboard, setThemeColor]);
+
+	return (
+		<section className="loginSection" id="homepage-login">
+			<div className="loginAnim">
+				<Lottie className="welcomeAnim" src={getAnimSrc("Welcome")} speed={0.6} />
+			</div>
+			<div className={`loginContainer ${profile || loggedIn ? "profile" : ""}`}>
+				<div className="loginCard front">
+					{isRegister ? (
+						<>
+							<div className="header">
+								<h3>Register</h3>
+								<h4>Create your restaurant account</h4>
+							</div>
+							<div className="inputContainer">
+								<Textfield icon="f015" placeholder="Restaurant name" value={regName} onChange={(e: ChangeEvent<HTMLInputElement>) => setRegName(e.target.value)} />
+								<Textfield icon="f007" placeholder="Username (e.g. starbucks)" value={regUsername} onChange={(e: ChangeEvent<HTMLInputElement>) => setRegUsername(e.target.value.toLowerCase())} />
+								<Textfield icon="f0e0" placeholder="Email" value={regEmail} onChange={(e: ChangeEvent<HTMLInputElement>) => setRegEmail(e.target.value)} />
+								<Textfield type="password" icon="f023" placeholder="Password" value={regPassword} onEnterKey={onRegister} onChange={(e: ChangeEvent<HTMLInputElement>) => setRegPassword(e.target.value)} />
+							</div>
+							<div className="loginAction">
+								<Button className="kitchenMode" type="secondary" label="Back to login" size="mini" onClick={() => setIsRegister(false)} />
+								<Button className="next" label="Register" onClick={onRegister} loading={nextLoading} />
+							</div>
+						</>
+					) : (
+					<>
+						<div className="header">
+							<h3>Login</h3>
+							<h4>Please enter credentials</h4>
+						</div>
+						<div className="inputContainer">
+							<Textfield
+								className={`email ${emailShake ? "shake" : ""}`}
+								icon="f0e0"
+								placeholder="Enter your email"
+								onEnterKey={onNext}
+								value={email}
+								onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+							/>
+						</div>
+						<div className="loginAction">
+							<Button className="next" label="Next" onClick={onNext} loading={nextLoading} />
+						</div>
+					</>
+					)}
+				</div>
+				<div className="loginCard back">
+					<div className="header">
+						{(session.data?.role === "admin" || session.data?.role === "kitchen") && profileLoading ? (
+							<div className="details">
+								<p className="name"> ZapOrder</p>
+							</div>
+						) : (
+							<>
+								<Avatar src={profile?.avatar ?? dashboard?.avatar ?? session.data?.restaurant?.avatar ?? ""} size="mini" />
+								<div className="details">
+									<p className="name"> {profile?.name ?? dashboard?.name ?? `${session.data?.customer?.fname} ${session.data?.customer?.lname}`} </p>
+									<p className="address">{profile?.address ?? dashboard?.address ?? session.data?.customer?.phone}</p>
+								</div>
+								<Button className="logout" icon={loggedIn ? "f011" : "f304"} size="mini" onClick={logout} loading={logoutLoading} />
+							</>
+						)}
+					</div>
+					{!loggedIn ? (
+						<div className="body">
+							<div className="inputContainer">
+								<Textfield
+									className={`username ${showKitchen ? "show" : ""}`}
+									icon="f86b"
+									placeholder="Enter kitchen username"
+									value={kitchenUsername}
+									onChange={(e: ChangeEvent<HTMLInputElement>) => setKitchenUsername(e.target.value)}
+								/>
+								<Textfield
+									type="password"
+									className={`password ${passwordShake ? "shake" : ""}`}
+									placeholder={`Enter ${showKitchen ? "kitchen" : "admin"} password`}
+									onEnterKey={onNext}
+									value={password}
+									onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+								/>
+							</div>
+							<div className="loginAction">
+								<Button
+									className={`kitchenMode ${showKitchen ? "active" : ""}`}
+									type={showKitchen ? "primary" : "secondary"}
+									label="login to kitchen"
+									size="mini"
+									onClick={() => setShowKitchen((v) => !v)}
+								/>
+								<Button className="next" label="Sign In" onClick={onNext} loading={nextLoading} />
+							</div>
+						</div>
+					) : (
+						<div className="loggedInAction">
+							{session.data?.role === "admin" && <Button label="open dashboard" icon="e323" size="mini" onClick={() => router.push("/dashboard")} />}
+							{session.data?.role === "kitchen" && (
+								<Button label="open kitchen" icon="f86b" size="mini" onClick={() => router.push("/kitchen")} />
+							)}
+							{session.data?.role === "customer" && (
+								<Button label="open  restaurant menu" icon="f86b" size="mini" onClick={() => router.push(`/${session.data?.restaurant?.username}`)} />
+							)}
+						</div>
+					)}
+				</div>
+			</div>
+		</section>
+	);
+};
+
+export default LoginSection;

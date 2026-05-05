@@ -1,0 +1,116 @@
+.createRestaurantPage {
+	width: 100dvw;
+	height: 100dvh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--colorBackgroundPrimary);
+
+	.createCard {
+		width: 100%;
+		max-width: 460px;
+		background: var(--colorBackgroundSecondary);
+		border-radius: 20px;
+		padding: 32px;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+
+		h2 {
+			margin: 0;
+			font-size: 22px;
+			font-variation-settings: 'wdth' 75, 'wght' 700;
+			color: var(--colorContentPrimary);
+		}
+
+		p {
+			margin: 0;
+			font-size: 13px;
+			color: var(--colorContentSecondary);
+		}
+
+		.adminTabs {
+			display: flex;
+			gap: 8px;
+			background: var(--colorBackgroundPrimary);
+			border-radius: 12px;
+			padding: 4px;
+
+			button {
+				flex: 1;
+				background: none;
+				border: none;
+				cursor: pointer;
+				padding: 8px;
+				border-radius: 8px;
+				font-size: 14px;
+				color: var(--colorContentSecondary);
+				transition: all 0.2s;
+
+				&.active {
+					background: var(--colorBackgroundSecondary);
+					color: var(--colorContentPrimary);
+					font-variation-settings: 'wght' 600;
+				}
+			}
+		}
+
+		.loadingText {
+			text-align: center;
+			color: var(--colorContentSecondary);
+			padding: 20px 0;
+		}
+
+		.accountsList {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			max-height: 400px;
+			overflow-y: auto;
+
+			.accountRow {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				background: var(--colorBackgroundPrimary);
+				border-radius: 12px;
+				padding: 12px 14px;
+				gap: 12px;
+				transition: background 0.2s;
+
+				&.confirming {
+					background: hsl(4 100% 60% / 10%);
+				}
+
+				.accountInfo {
+					display: flex;
+					flex-direction: column;
+					gap: 2px;
+					overflow: hidden;
+
+					.accountName {
+						margin: 0;
+						font-size: 14px;
+						font-variation-settings: 'wght' 600;
+						color: var(--colorContentPrimary);
+					}
+
+					.accountEmail {
+						margin: 0;
+						font-size: 12px;
+						color: var(--colorContentSecondary);
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
+
+				.confirmBtns {
+					display: flex;
+					gap: 6px;
+					flex-shrink: 0;
+				}
+			}
+		}
+	}
+}
