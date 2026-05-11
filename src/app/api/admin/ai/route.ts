@@ -5,12 +5,12 @@ import { authOptions } from "#utils/helper/authHelper";
 export async function PUT(req: Request) {
 	try {
 		const session = await getServerSession(authOptions);
-		if (!session?.user?.username) return Response.json({ error: "Unauthorized" }, { status: 401 });
+		if (!session?.username) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
 		const { aiProvider, aiModel, aiApiKey, aiName } = await req.json();
 
 		await prisma.account.update({
-			where: { username: session.user.username },
+			where: { username: session.username },
 			data: { aiProvider, aiModel, aiApiKey, aiName },
 		});
 
@@ -24,10 +24,10 @@ export async function PUT(req: Request) {
 export async function GET(req: Request) {
 	try {
 		const session = await getServerSession(authOptions);
-		if (!session?.user?.username) return Response.json({ error: "Unauthorized" }, { status: 401 });
+		if (!session?.username) return Response.json({ error: "Unauthorized" }, { status: 401 });
 
 		const account = await prisma.account.findUnique({
-			where: { username: session.user.username },
+			where: { username: session.username },
 			select: { aiProvider: true, aiModel: true, aiName: true },
 		});
 
