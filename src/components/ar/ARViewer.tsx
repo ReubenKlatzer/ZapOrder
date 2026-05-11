@@ -89,6 +89,7 @@ const ARViewer = ({ item, onClose }: TARViewerProps) => {
 						<p className="arErrorHint">Showing product image instead</p>
 					</div>
 				) : (
+					{/* @ts-ignore */}
 					<model-viewer
 						class="arViewerModel"
 						src={modelSrc}
