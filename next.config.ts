@@ -2,10 +2,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
 	typescript: {
-		ignoredBuildErrors: true,
+		ignoreBuildErrors: true,
 	},
 	eslint: {
-		ignoredDuringBuilds: true,
+		ignoreDuringBuilds: true,
 	},
 	async headers() {
 		return [
