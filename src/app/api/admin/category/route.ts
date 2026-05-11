@@ -25,7 +25,8 @@ export async function POST(req: Request) {
 		return NextResponse.json({ message: "Categories updated" });
 	} catch (err) {
 		console.log(err);
-		return CatchNextResponse(err as { message?: string; status?: number });
+		const error = err as { message?: string; status?: number };
+		return CatchNextResponse({ message: error.message ?? "Something went wrong", status: error.status ?? 500 });
 	}
 }
 
