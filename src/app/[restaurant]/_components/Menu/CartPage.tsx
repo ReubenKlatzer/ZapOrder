@@ -25,7 +25,7 @@ const CartPage = (props: TCartPageProps) => {
 	const [bottomBarActive, setBottomBarActive] = useState(false);
 	const [showTaxSummary, setShowTaxSummary] = useState(false);
 
-	const approvedProducts = order?.products?.reduce((acc, product) => (product.adminApproved ? acc + 1 : acc), 0);
+	const approvedProducts = order?.products?.reduce((acc: number, product) => (product.adminApproved ? acc + 1 : acc), 0);
 
 	const onOrderAction = async () => {
 		if (bottomBarActive) {

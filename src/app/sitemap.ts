@@ -1,11 +1,9 @@
 import type { MetadataRoute } from "next";
-import connectDB from "#utils/database/connect";
-import { Profiles } from "#utils/database/models/profile";
+import prisma from "#utils/database/connect";
 import { SITE_URL } from "#utils/seo/constants";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	await connectDB();
-	const restaurants = await Profiles.find({}, { restaurantID: 1, updatedAt: 1 }).lean();
+	const restaurants = await prisma.profile.findMany({ select: { restaurantID: true, updatedAt: true } });
 
 	const restaurantEntries: MetadataRoute.Sitemap = restaurants.map((r) => ({
 		url: `${SITE_URL}/${r.restaurantID}`,
