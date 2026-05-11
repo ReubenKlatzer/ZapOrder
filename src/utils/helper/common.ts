@@ -13,7 +13,10 @@ export const fetcher = (url: string) =>
 		}
 		throw new Error("Response is not JSON");
 	});
-export const CatchNextResponse = ({ message = "Something went wrong", status = 500 }: NextResponseError) => {
+export const CatchNextResponse = (error: Partial<NextResponseError> | unknown) => {
+	const err = error as Partial<NextResponseError>;
+	const message = err?.message ?? "Something went wrong";
+	const status = err?.status ?? 500;
 	return NextResponse.json({ message, status }, { status });
 };
 
