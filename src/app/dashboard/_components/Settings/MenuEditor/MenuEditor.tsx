@@ -14,11 +14,13 @@ import "./menuEditor.scss";
 
 const emptyForm = { name: "", description: "", category: "", price: "", taxPercent: "0", veg: "veg", foodType: "", image: "", _id: "" };
 
+
 const MenuEditor = () => {
 	const { profile, menus, profileLoading, profileMutate } = useAdmin();
 	const [modalOpen, setModalOpen] = useState(false);
 	const [form, setForm] = useState(emptyForm);
 	const [saving, setSaving] = useState(false);
+	const [aiGenerating, setAiGenerating] = useState(false);
 	const [hideSettingsLoading, setHideSettingsLoading] = useState<string[]>([]);
 	const [deleteItemLoading, setDeleteItemLoading] = useState<string[]>([]);
 	const [category, setCategory] = useState(0);
@@ -118,6 +120,24 @@ const MenuEditor = () => {
 		setSaving(false);
 	};
 
+	const onAiFill = async () => {
+		if (!form.name) return toast.error("Enter an item name first");
+		setAiGenerating(true);
+		try {
+			const res = await fetch("/api/admin/menu/generate", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name: form.name, category: form.category }),
+			});
+			const data = await res.json();
+			if (!res.ok) toast.error(data?.message);
+			else setForm((f) => ({ ...f, description: data.description, image: data.image }));
+		} catch {
+			toast.error("AI generation failed");
+		}
+		setAiGenerating(false);
+	};
+
 	const closeModal = (v: boolean) => { setModalOpen(v); if (!v) setForm(emptyForm); };
 
 	if (profileLoading) return <Spinner fullpage label="Loading Menu..." />;
@@ -137,6 +157,7 @@ const MenuEditor = () => {
 				<div style={{ display: "flex", flexDirection: "column", gap: 12, width: "100%" }}>
 					<h3 style={{ margin: 0 }}>{form._id ? "Edit Item" : "Add Menu Item"}</h3>
 					<Textfield placeholder="Item name *" value={form.name} onChange={set("name")} />
+					<Button label={aiGenerating ? "Generating..." : "AI Fill"} onClick={onAiFill} loading={aiGenerating} type="secondary" />
 					<Textfield placeholder="Description" value={form.description} onChange={set("description")} />
 					<select value={form.category} onChange={set("category")} style={selectStyle}>
 						<option value="">Select category *</option>
