@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import { ID_SUFFIX, REF_NOVABITE, TYPE_ACCOUNT, TYPE_KITCHEN, TYPE_PROFILE, TYPE_TABLE } from "../constants";
 import { menus } from "./novabiteMenu";
 
 const account = {
-	_id: new mongoose.Types.ObjectId(`${REF_NOVABITE}${TYPE_ACCOUNT}${ID_SUFFIX}000001`),
+	_id: `${REF_NOVABITE}${TYPE_ACCOUNT}${ID_SUFFIX}000001`,
 	email: "admin@novabite.com",
 	username: "novabite",
 	password: "novabite@123",
@@ -11,7 +10,7 @@ const account = {
 };
 
 const profile = {
-	_id: new mongoose.Types.ObjectId(`${REF_NOVABITE}${TYPE_PROFILE}${ID_SUFFIX}000001`),
+	_id: `${REF_NOVABITE}${TYPE_PROFILE}${ID_SUFFIX}000001`,
 	name: "Novabite",
 	restaurantID: "novabite",
 	description: "A modern casual dining experience where bold flavours meet a relaxed atmosphere. From wood-fired mains to handcrafted desserts, every bite is designed to delight.",
@@ -32,7 +31,7 @@ const profile = {
 
 const kitchens = [
 	{
-		_id: new mongoose.Types.ObjectId(`${REF_NOVABITE}${TYPE_KITCHEN}${ID_SUFFIX}000001`),
+		_id: `${REF_NOVABITE}${TYPE_KITCHEN}${ID_SUFFIX}000001`,
 		restaurantID: "novabite",
 		username: "novabiteKitchen1",
 		password: "123456",
@@ -40,7 +39,7 @@ const kitchens = [
 ];
 
 const tables = Array.from({ length: 8 }, (_, i) => ({
-	_id: new mongoose.Types.ObjectId(`${REF_NOVABITE}${TYPE_TABLE}${ID_SUFFIX}${i.toString().padStart(6, "0")}`),
+	_id: `${REF_NOVABITE}${TYPE_TABLE}${ID_SUFFIX}${i.toString().padStart(6, "0")}`,
 	restaurantID: "novabite",
 	name: `Table ${i + 1}`,
 	username: (i + 1).toString(),

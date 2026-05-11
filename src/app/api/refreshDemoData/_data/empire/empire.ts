@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
 import { ID_SUFFIX, REF_EMPIRE, TYPE_ACCOUNT, TYPE_KITCHEN, TYPE_PROFILE, TYPE_TABLE } from "../constants";
 import { menus } from "./empireMenu";
 
 const account = {
-	_id: new mongoose.Types.ObjectId(`${REF_EMPIRE}${TYPE_ACCOUNT}${ID_SUFFIX}000001`),
+	_id: `${REF_EMPIRE}${TYPE_ACCOUNT}${ID_SUFFIX}000001`,
 	email: "admin@empire.com",
 	username: "empire",
 	password: "empire@123",
@@ -11,7 +10,7 @@ const account = {
 };
 
 const profile = {
-	_id: new mongoose.Types.ObjectId(`${REF_EMPIRE}${TYPE_PROFILE}${ID_SUFFIX}000001`),
+	_id: `${REF_EMPIRE}${TYPE_PROFILE}${ID_SUFFIX}000001`,
 	name: "Empire Restaurant",
 	restaurantID: "empire",
 	description: "Casual Dining - Kerala, Biryani, North Indian, South Indian, Chinese, Arabian, Seafood",
@@ -56,7 +55,7 @@ const profile = {
 
 const kitchens = [
 	{
-		_id: new mongoose.Types.ObjectId(`${REF_EMPIRE}${TYPE_KITCHEN}${ID_SUFFIX}000001`),
+		_id: `${REF_EMPIRE}${TYPE_KITCHEN}${ID_SUFFIX}000001`,
 		restaurantID: "empire",
 		username: "empireKitchen1",
 		password: "123456",
@@ -64,7 +63,7 @@ const kitchens = [
 ];
 
 const tables = Array.from({ length: 5 }, (_, i) => ({
-	_id: new mongoose.Types.ObjectId(`${REF_EMPIRE}${TYPE_TABLE}${ID_SUFFIX}${i.toString().padStart(6, "0")}`),
+	_id: `${REF_EMPIRE}${TYPE_TABLE}${ID_SUFFIX}${i.toString().padStart(6, "0")}`,
 	restaurantID: "empire",
 	name: `Table ${i}`,
 	username: i.toString(),
