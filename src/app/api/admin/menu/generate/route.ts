@@ -26,7 +26,6 @@ export async function POST(req: Request) {
 			{
 				system: "You are a restaurant menu assistant. Write concise, appetizing menu item descriptions in 1-2 sentences. Only return the description text, nothing else.",
 				prompt: `Write a short menu description for: "${name}"${category ? ` (category: ${category})` : ""}`,
-				maxTokens: 100,
 			},
 			aiConfig,
 		);
