@@ -9,6 +9,7 @@ import Collapsible from "#components/layout/Collapsible";
 import NoContent from "#components/layout/NoContent";
 import { getAnimSrc } from "#utils/constants/common";
 import type { TMenu } from "#utils/database/models/menu.js";
+import type { TProduct } from "#utils/database/models/order";
 
 import ItemCard from "../../../../components/layout/ItemCard";
 
@@ -25,7 +26,7 @@ const CartPage = (props: TCartPageProps) => {
 	const [bottomBarActive, setBottomBarActive] = useState(false);
 	const [showTaxSummary, setShowTaxSummary] = useState(false);
 
-	const approvedProducts = order?.products?.reduce((acc: number, product) => (product.adminApproved ? acc + 1 : acc), 0);
+	const approvedProducts = order?.products?.reduce((acc: number, product: TProduct) => (product.adminApproved ? acc + 1 : acc), 0);
 
 	const onOrderAction = async () => {
 		if (bottomBarActive) {
