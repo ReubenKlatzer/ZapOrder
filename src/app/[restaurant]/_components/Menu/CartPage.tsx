@@ -106,7 +106,7 @@ const CartPage = (props: TCartPageProps) => {
 						expand={showOrderHistory}
 						setExpand={setShowOrderHistory}
 						alert={order?.products?.length}>
-						{order?.products.map((product: TProduct, key) => {
+						{order?.products.map((product: TProduct, key: number) => {
 							return <ItemCard key={key} item={{ ...product.menu, quantity: product.quantity } as TMenuCustom} staticCard />;
 						})}
 					</Collapsible>
