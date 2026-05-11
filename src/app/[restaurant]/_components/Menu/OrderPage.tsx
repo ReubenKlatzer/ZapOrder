@@ -265,7 +265,7 @@ const OrderPage = () => {
 													increaseQuantity={increaseProductQuantity}
 													decreaseQuantity={decreaseProductQuantity}
 													showInfo={item.id === showInfoCard}
-													setShowInfo={(v) => setShowInfoCard(v)}
+													setShowInfo={(v) => setShowInfoCard(v ? item.id : false)}
 													show={!!item.image}
 													quantity={
 														(selectedProducts.some((obj) => obj.id === item.id) &&
@@ -290,7 +290,7 @@ const OrderPage = () => {
 											increaseQuantity={increaseProductQuantity}
 											decreaseQuantity={decreaseProductQuantity}
 											showInfo={item.id === showInfoCard}
-											setShowInfo={(v) => setShowInfoCard(v)}
+											setShowInfo={(v) => setShowInfoCard(v ? item.id : false)}
 											show={!item.image}
 											quantity={
 												(selectedProducts.some((obj) => obj.id === item.id) &&
