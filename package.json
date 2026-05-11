@@ -7,7 +7,8 @@
 		"play": "next dev -p 3000",
 		"dev": "doppler run --command=\"PORT=3050 next dev\"",
 		"build:dev": "doppler run --command=\"next build\"",
-		"build": "next build",
+		"build": "prisma generate && next build",
+		"postinstall": "prisma generate",
 		"start": "next start",
 		"lint": "biome check --write",
 		"clean": "rm -rf node_modules pnpm-lock.yaml .next && pnpm install"
