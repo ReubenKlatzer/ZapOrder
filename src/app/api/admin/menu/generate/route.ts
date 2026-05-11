@@ -33,72 +33,64 @@ export async function POST(req: Request) {
 		const description = result.text.trim();
 
 		let image = "";
-		const searchQueries = [
-			`${name} food dish`,
-			`${name} food`,
-			`${name} meal`,
-			`${name} cuisine`,
-			name,
-			category ? `${category} food` : ""
-		].filter(Boolean);
-
+		
 		try {
-			for (const query of searchQueries) {
-				if (image) break;
-
-				const unsplashRes = await fetch(
-					`https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&client_id=tXrQAJY-AZ_m0lZu5vH_yQoc-UdVfOcnjrflDWiMh0Q`
-				);
-				if (unsplashRes.ok) {
-					const unsplashData = await unsplashRes.json();
-					image = unsplashData?.results?.[0]?.urls?.regular ?? "";
-				}
-			}
-
-			if (!image) {
+			// Try Wikipedia first
+			try {
 				const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(name)}`);
 				if (wikiRes.ok) {
 					const wikiData = await wikiRes.json();
 					image = wikiData?.thumbnail?.source ?? wikiData?.originalimage?.source ?? "";
+					if (image) console.log("Found image from Wikipedia:", image);
 				}
+			} catch (e) {
+				console.log("Wikipedia failed:", e);
 			}
 
+			// Try Unsplash
 			if (!image) {
-				for (const query of searchQueries) {
-					if (image) break;
-					
-					const pexelsRes = await fetch(
-						`https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`,
-						{ headers: { Authorization: "563492ad6f91700001000001c9d8d2a9c3d54d7f8b8c8f8c8c8c8c8c" } }
+				try {
+					const unsplashRes = await fetch(
+						`https://api.unsplash.com/search/photos?query=${encodeURIComponent(name + " food")}&per_page=1`,
+						{ headers: { Authorization: "Client-ID tXrQAJY-AZ_m0lZu5vH_yQoc-UdVfOcnjrflDWiMh0Q" } }
 					);
-					if (pexelsRes.ok) {
-						const pexelsData = await pexelsRes.json();
-						image = pexelsData?.photos?.[0]?.src?.large ?? "";
+					if (unsplashRes.ok) {
+						const unsplashData = await unsplashRes.json();
+						image = unsplashData?.results?.[0]?.urls?.regular ?? "";
+						if (image) console.log("Found image from Unsplash:", image);
 					}
+				} catch (e) {
+					console.log("Unsplash failed:", e);
 				}
 			}
 
+			// Try Foodish API (always returns a food image)
 			if (!image) {
-				const pixabayRes = await fetch(
-					`https://pixabay.com/api/?key=47581730-8b597d89f8c8b8c8c8c8c8c8&q=${encodeURIComponent(name + " food")}&image_type=photo&per_page=3`
-				);
-				if (pixabayRes.ok) {
-					const pixabayData = await pixabayRes.json();
-					image = pixabayData?.hits?.[0]?.largeImageURL ?? "";
+				try {
+					const foodishRes = await fetch("https://foodish-api.com/api/");
+					if (foodishRes.ok) {
+						const foodishData = await foodishRes.json();
+						image = foodishData?.image ?? "";
+						if (image) console.log("Found image from Foodish:", image);
+					}
+				} catch (e) {
+					console.log("Foodish failed:", e);
 				}
 			}
 
+			// Try LoremFlickr (always returns an image)
 			if (!image) {
-				const foodishRes = await fetch(`https://foodish-api.com/api/`);
-				if (foodishRes.ok) {
-					const foodishData = await foodishRes.json();
-					image = foodishData?.image ?? "";
-				}
+				image = `https://loremflickr.com/400/300/${encodeURIComponent(name)},food`;
+				console.log("Using LoremFlickr:", image);
 			}
-		} catch {
-			image = "";
+
+		} catch (error) {
+			console.error("All image sources failed:", error);
+			// Fallback to a generic food image
+			image = "https://loremflickr.com/400/300/food";
 		}
 
+		console.log("Final image URL:", image);
 		return NextResponse.json({ description, image });
 	} catch (err) {
 		return CatchNextResponse(err as { message?: string; status?: number });
