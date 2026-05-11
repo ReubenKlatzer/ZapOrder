@@ -60,14 +60,16 @@ export default function CreateRestaurantPage() {
 
 	const onCreate = async () => {
 		if (!name || !username || !email || !password) return toast.error("All fields are required");
+		const secret = process.env.NEXT_PUBLIC_REGISTER_SECRET;
+		if (!secret) return toast.error("Registration secret not configured. Check environment variables.");
 		setSubmitting(true);
 		const res = await fetch("/api/auth/register", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ name, username, email, password, secret: process.env.NEXT_PUBLIC_REGISTER_SECRET }),
+			body: JSON.stringify({ name, username, email, password, secret }),
 		});
 		const data = await res.json();
-		if (!res.ok) toast.error(data?.message);
+		if (!res.ok) toast.error(data?.message || "Failed to create restaurant");
 		else {
 			toast.success(`Restaurant "${name}" created!`);
 			setName(""); setUsername(""); setEmail(""); setPassword("");
