@@ -106,7 +106,7 @@ const CartPage = (props: TCartPageProps) => {
 						expand={showOrderHistory}
 						setExpand={setShowOrderHistory}
 						alert={order?.products?.length}>
-						{order?.products.map((product, key) => {
+						{order?.products.map((product: TProduct, key) => {
 							return <ItemCard key={key} item={{ ...product.menu, quantity: product.quantity } as TMenuCustom} staticCard />;
 						})}
 					</Collapsible>
@@ -168,7 +168,7 @@ const CartPage = (props: TCartPageProps) => {
 							onClick={() => setShowTaxSummary((v) => !v)}
 						/>
 						<div className="taxSummary">
-							{order?.products?.map((product, i) => (
+							{order?.products?.map((product: TProduct, i) => (
 								<CartTaxItem key={i} name={product?.menu?.name ?? ""} size="mini" taxPercent={product?.menu?.taxPercent} amount={product?.quantity * product?.tax} />
 							))}
 						</div>
