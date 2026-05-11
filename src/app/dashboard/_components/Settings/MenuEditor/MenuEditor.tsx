@@ -130,9 +130,15 @@ const MenuEditor = () => {
 				body: JSON.stringify({ name: form.name, category: form.category }),
 			});
 			const data = await res.json();
+			console.log("AI Fill response:", data);
 			if (!res.ok) toast.error(data?.message);
-			else setForm((f) => ({ ...f, description: data.description, image: data.image }));
-		} catch {
+			else {
+				setForm((f) => ({ ...f, description: data.description, image: data.image || "" }));
+				if (data.image) toast.success("Description and image generated!");
+				else toast.success("Description generated! (No image found)");
+			}
+		} catch (error) {
+			console.error("AI generation error:", error);
 			toast.error("AI generation failed");
 		}
 		setAiGenerating(false);
