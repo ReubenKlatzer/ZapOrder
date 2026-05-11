@@ -41,56 +41,54 @@ export async function POST(req: Request) {
 				if (wikiRes.ok) {
 					const wikiData = await wikiRes.json();
 					image = wikiData?.thumbnail?.source ?? wikiData?.originalimage?.source ?? "";
-					if (image) console.log("Found image from Wikipedia:", image);
 				}
 			} catch (e) {
-				console.log("Wikipedia failed:", e);
+				console.log("Wikipedia failed");
 			}
 
-			// Try Unsplash
+			// Try Unsplash with random page
 			if (!image) {
 				try {
+					const randomPage = Math.floor(Math.random() * 3) + 1;
 					const unsplashRes = await fetch(
-						`https://api.unsplash.com/search/photos?query=${encodeURIComponent(name + " food")}&per_page=1`,
+						`https://api.unsplash.com/search/photos?query=${encodeURIComponent(name + " food")}&per_page=1&page=${randomPage}`,
 						{ headers: { Authorization: "Client-ID tXrQAJY-AZ_m0lZu5vH_yQoc-UdVfOcnjrflDWiMh0Q" } }
 					);
 					if (unsplashRes.ok) {
 						const unsplashData = await unsplashRes.json();
 						image = unsplashData?.results?.[0]?.urls?.regular ?? "";
-						if (image) console.log("Found image from Unsplash:", image);
 					}
 				} catch (e) {
-					console.log("Unsplash failed:", e);
+					console.log("Unsplash failed");
 				}
 			}
 
-			// Try Foodish API (always returns a food image)
+			// Try Foodish API (always returns a random food image)
 			if (!image) {
 				try {
 					const foodishRes = await fetch("https://foodish-api.com/api/");
 					if (foodishRes.ok) {
 						const foodishData = await foodishRes.json();
 						image = foodishData?.image ?? "";
-						if (image) console.log("Found image from Foodish:", image);
 					}
 				} catch (e) {
-					console.log("Foodish failed:", e);
+					console.log("Foodish failed");
 				}
 			}
 
-			// Try LoremFlickr (always returns an image)
+			// Try LoremFlickr with random seed
 			if (!image) {
-				image = `https://loremflickr.com/400/300/${encodeURIComponent(name)},food`;
-				console.log("Using LoremFlickr:", image);
+				const randomSeed = Math.floor(Math.random() * 10000);
+				image = `https://loremflickr.com/400/300/${encodeURIComponent(name)},food?random=${randomSeed}`;
 			}
 
 		} catch (error) {
 			console.error("All image sources failed:", error);
-			// Fallback to a generic food image
-			image = "https://loremflickr.com/400/300/food";
+			// Fallback to a random generic food image
+			const randomSeed = Math.floor(Math.random() * 10000);
+			image = `https://loremflickr.com/400/300/food?random=${randomSeed}`;
 		}
 
-		console.log("Final image URL:", image);
 		return NextResponse.json({ description, image });
 	} catch (err) {
 		return CatchNextResponse(err as { message?: string; status?: number });
