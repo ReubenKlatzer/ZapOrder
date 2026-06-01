@@ -111,6 +111,15 @@
 	}
 }
 
+@media (max-height: 600px) {
+	.userLogin {
+		.content {
+			height: auto;
+			min-height: 80px;
+		}
+	}
+}
+
 @media (height <= 535px) {
 	.userLogin {
 		&.openCodeSelector {
