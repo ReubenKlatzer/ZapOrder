@@ -2,6 +2,7 @@ import clsx from "clsx";
 import { useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import { Button } from "xtreme-ui";
 
 import { useOrder } from "#components/context/useContext";
@@ -15,6 +16,7 @@ import ItemCard from "../../../../components/layout/ItemCard";
 import CartTaxItem from "./CartTaxItem";
 import OrderTracking from "./OrderTracking";
 import CustomerOrderHistory from "./CustomerOrderHistory";
+import PaymentModal from "./PaymentModal";
 import "./cartPage.scss";
 
 const CartPage = (props: TCartPageProps) => {
@@ -26,6 +28,7 @@ const CartPage = (props: TCartPageProps) => {
 	const [selectionTotal, setSelectionTotal] = useState(0);
 	const [bottomBarActive, setBottomBarActive] = useState(false);
 	const [showTaxSummary, setShowTaxSummary] = useState(false);
+	const [showPaymentModal, setShowPaymentModal] = useState(false);
 
 	const approvedProducts = order?.products?.reduce((acc: number, product: TProduct) => (product.adminApproved ? acc + 1 : acc), 0);
 
@@ -36,13 +39,18 @@ const CartPage = (props: TCartPageProps) => {
 		}
 
 		if (props.selectedProducts.length === 0) {
-			// TODO: Implement payment/checkout flow
-			alert("Payment feature coming soon! For now, your order has been placed.");
+			// Open payment modal for existing order
+			setShowPaymentModal(true);
 			return;
 		}
 
 		await placeOrder(selectedProducts);
 		resetSelectedProducts();
+	};
+
+	const handlePaymentComplete = () => {
+		toast.success("Payment successful! Thank you for your order.");
+		// You can add additional logic here like marking order as paid
 	};
 	const onCancelOrder = async () => {
 		await cancelOrder();
@@ -78,7 +86,7 @@ const CartPage = (props: TCartPageProps) => {
 	if (!props.selectedProducts.length && !order?.products?.length) {
 		return (
 			<div className="cartPage">
-				<NoContent label="Aren't you hungry?" />
+				<NoContent label="Your cart is empty" />
 				<CustomerOrderHistory />
 			</div>
 		);
@@ -182,6 +190,13 @@ const CartPage = (props: TCartPageProps) => {
 					</div>
 				)}
 			</div>
+			<PaymentModal
+				isOpen={showPaymentModal}
+				onClose={() => setShowPaymentModal(false)}
+				orderTotal={order?.orderTotal ?? 0}
+				taxTotal={order?.taxTotal ?? 0}
+				onPaymentComplete={handlePaymentComplete}
+			/>
 		</div>
 	);
 };

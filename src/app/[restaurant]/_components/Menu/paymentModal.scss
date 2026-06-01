@@ -1,0 +1,201 @@
+.paymentModalOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	backdrop-filter: blur(4px);
+}
+
+.paymentModal {
+	background: var(--bg-primary);
+	border-radius: 16px;
+	width: 90%;
+	max-width: 450px;
+	max-height: 90vh;
+	overflow: auto;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+	.modalHeader {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 20px;
+		border-bottom: 1px solid var(--border-primary);
+
+		h3 {
+			margin: 0;
+			font-size: 20px;
+			font-weight: 600;
+		}
+
+		.closeBtn {
+			background: none;
+			border: none;
+			font-size: 28px;
+			cursor: pointer;
+			color: var(--text-secondary);
+			line-height: 1;
+			padding: 0;
+			width: 32px;
+			height: 32px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 8px;
+			transition: all 0.2s;
+
+			&:hover {
+				background: var(--bg-secondary);
+				color: var(--text-primary);
+			}
+		}
+	}
+
+	.modalBody {
+		padding: 20px;
+
+		.billSummary {
+			background: var(--bg-secondary);
+			padding: 16px;
+			border-radius: 12px;
+			margin-bottom: 24px;
+
+			.summaryRow {
+				display: flex;
+				justify-content: space-between;
+				margin-bottom: 12px;
+				font-size: 15px;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+
+				&.total {
+					font-size: 18px;
+					font-weight: 600;
+					color: var(--primary);
+					margin-top: 8px;
+				}
+			}
+
+			hr {
+				border: none;
+				border-top: 1px solid var(--border-primary);
+				margin: 12px 0;
+			}
+		}
+
+		.paymentMethods {
+			margin-bottom: 20px;
+
+			h4 {
+				font-size: 16px;
+				margin-bottom: 12px;
+				font-weight: 600;
+			}
+
+			.methodOptions {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 12px;
+
+				.methodBtn {
+					background: var(--bg-secondary);
+					border: 2px solid var(--border-primary);
+					border-radius: 12px;
+					padding: 16px 12px;
+					cursor: pointer;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					gap: 8px;
+					transition: all 0.2s;
+					font-size: 14px;
+
+					i {
+						font-size: 24px;
+					}
+
+					&:hover {
+						border-color: var(--primary);
+						background: var(--bg-primary);
+					}
+
+					&.active {
+						border-color: var(--primary);
+						background: var(--primary-light);
+						color: var(--primary);
+					}
+				}
+			}
+		}
+
+		.paymentForm {
+			margin-bottom: 20px;
+
+			input {
+				width: 100%;
+				padding: 12px 16px;
+				border: 2px solid var(--border-primary);
+				border-radius: 8px;
+				font-size: 15px;
+				margin-bottom: 12px;
+				background: var(--bg-primary);
+				color: var(--text-primary);
+				transition: border-color 0.2s;
+
+				&:focus {
+					outline: none;
+					border-color: var(--primary);
+				}
+
+				&::placeholder {
+					color: var(--text-tertiary);
+				}
+			}
+
+			.formRow {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 12px;
+			}
+		}
+
+		.cashNote {
+			background: var(--bg-secondary);
+			padding: 16px;
+			border-radius: 12px;
+			text-align: center;
+			margin-bottom: 20px;
+
+			p {
+				margin: 0;
+				font-size: 16px;
+			}
+		}
+
+		.demoNotice {
+			background: #fff3cd;
+			color: #856404;
+			padding: 12px;
+			border-radius: 8px;
+			text-align: center;
+			font-size: 13px;
+			font-weight: 500;
+		}
+	}
+
+	.modalFooter {
+		padding: 16px 20px;
+		border-top: 1px solid var(--border-primary);
+		display: flex;
+		gap: 12px;
+		justify-content: flex-end;
+	}
+}

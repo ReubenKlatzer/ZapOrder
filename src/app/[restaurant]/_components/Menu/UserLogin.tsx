@@ -68,7 +68,7 @@ const phoneNumber = `+${dialCode}${phone}`;
 			setButtonLabel("Next");
 			phoneRef.current?.focus();
 		} else if (page === "signOTP") {
-			setHeading(["Glad to", " see you here"]);
+			setHeading(["Welcome", " back"]);
 			setButtonLabel("Order");
 		} else if (page === "loginOTP") {
 			setHeading(["Welcome", " back User"]);
