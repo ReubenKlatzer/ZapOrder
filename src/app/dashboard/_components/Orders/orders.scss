@@ -76,6 +76,10 @@
 			margin: 20px 10px;
 		}
 	}
+
+	.mobileBackBtn {
+		display: none !important;
+	}
 }
 
 @media (width <= 1000px) {
@@ -123,7 +127,25 @@
 			}
 
 			.details {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				border-radius: 0;
+				z-index: 100;
 				display: none;
+				overflow-y: auto;
+
+				.mobileBackBtn {
+					display: flex !important;
+					margin: 12px 12px 0;
+				}
+
+				&.open {
+					display: block;
+				}
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Button, Icon } from "xtreme-ui";
+import { toast } from "react-toastify";
 
 import Collapsible from "#components/layout/Collapsible";
 import NoContent from "#components/layout/NoContent";
@@ -11,12 +12,34 @@ import ItemCard from "../../../../components/layout/ItemCard";
 
 import "./orderDetail.scss";
 
+const TRACKING_STATUSES = [
+	{ key: "placed", label: "Placed" },
+	{ key: "confirmed", label: "Confirmed" },
+	{ key: "preparing", label: "Preparing" },
+	{ key: "transit", label: "On the Way" },
+	{ key: "delivered", label: "Delivered" },
+];
+
 const OrderDetail = (props: TOrderDetailProps) => {
 	const { data, actions, busy, reject, setReject, action } = props;
 	const queryParams = useSearchParams();
 	const subTab = queryParams.get("subTab") ?? "";
 
 	const [showApprovedItems, setShowApprovedItems] = useState(false);
+	const [updatingTracking, setUpdatingTracking] = useState(false);
+	const [trackingStatus, setTrackingStatus] = useState(data.trackingStatus ?? "placed");
+
+	const updateTracking = async (status: string) => {
+		setUpdatingTracking(true);
+		const res = await fetch("/api/order/tracking", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ orderId: data.id, status }),
+		});
+		if (res.ok) setTrackingStatus(status);
+		else toast.error("Failed to update tracking status");
+		setUpdatingTracking(false);
+	};
 
 	const { approvedItems, requestedItems } = useMemo(
 		() => ({
@@ -88,13 +111,27 @@ const OrderDetail = (props: TOrderDetailProps) => {
 					</div>
 					{data?.orderTotal ? (
 						<div className="total">
-							<Icon code="f155" type="solid" size={16} />
-							{data?.orderTotal}
+							R {data?.orderTotal}
 						</div>
 					) : null}
 				</div>
 				<OptionButtons />
 			</div>
+			{subTab === "active" && (
+				<div className="trackingBar">
+					{TRACKING_STATUSES.map((s) => (
+						<button
+							key={s.key}
+							type="button"
+							className={`trackBtn ${trackingStatus === s.key ? "active" : ""}`}
+							disabled={updatingTracking}
+							onClick={() => updateTracking(s.key)}
+						>
+							{s.label}
+						</button>
+					))}
+				</div>
+			)}
 			<div className="detailContent">
 				{data?.products?.length === 0 ? (
 					<NoContent label="No approved orders from this table yet!" animationName="GhostNoContent" />

@@ -2,18 +2,19 @@ import clsx from "clsx";
 import { useSearchParams } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Button, Lottie } from "xtreme-ui";
+import { Button } from "xtreme-ui";
 
 import { useOrder } from "#components/context/useContext";
 import Collapsible from "#components/layout/Collapsible";
 import NoContent from "#components/layout/NoContent";
-import { getAnimSrc } from "#utils/constants/common";
 import type { TMenu } from "#utils/database/models/menu.js";
 import type { TProduct } from "#utils/database/models/order";
 
 import ItemCard from "../../../../components/layout/ItemCard";
 
 import CartTaxItem from "./CartTaxItem";
+import OrderTracking from "./OrderTracking";
+import CustomerOrderHistory from "./CustomerOrderHistory";
 import "./cartPage.scss";
 
 const CartPage = (props: TCartPageProps) => {
@@ -75,7 +76,8 @@ const CartPage = (props: TCartPageProps) => {
 	if (!props.selectedProducts.length && !order?.products?.length) {
 		return (
 			<div className="cartPage">
-				<NoContent label={"Aren't you hungry?"} animationName="FoodBurgerHappy" />
+				<NoContent label="Aren't you hungry?" />
+				<CustomerOrderHistory />
 			</div>
 		);
 	}
@@ -84,11 +86,11 @@ const CartPage = (props: TCartPageProps) => {
 		return (
 			<div className="cartPage">
 				<div className="cartApproval">
-					<Lottie className="burgerLoader" src={getAnimSrc("FoodCook")} size={250} />
 					<div className="approvalHeading">
 						<p>Your order</p>
 						<p>will be accepted soon</p>
 					</div>
+					{order?.id && <OrderTracking orderId={order.id} />}
 					<Button className="endOrder" type="secondaryDanger" size="mini" label="Cancel Order" loading={cancelingOrder} onClick={onCancelOrder} />
 				</div>
 			</div>
@@ -98,6 +100,7 @@ const CartPage = (props: TCartPageProps) => {
 	return (
 		<div className="cartPage">
 			<div className="cartItems">
+				{order?.id && <OrderTracking orderId={order.id} />}
 				{order?.products?.length && approvedProducts && (
 					<Collapsible
 						className="orderedProducts"

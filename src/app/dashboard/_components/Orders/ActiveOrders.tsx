@@ -6,6 +6,7 @@ import ItemCard from "#components/layout/ItemCard";
 import NoContent from "#components/layout/NoContent";
 import type { TMenu } from "#utils/database/models/menu";
 import type { TOrder } from "#utils/database/models/order";
+import { Button } from "xtreme-ui";
 
 import OrderDetail from "./OrderDetail";
 import OrdersCard from "./OrdersCard";
@@ -17,6 +18,7 @@ const ActiveOrders = (props: TActiveOrdersProps) => {
 	const [activeCardData, setActiveCardData] = useState<TOrder>();
 	const [rejectCard, setRejectCard] = useState<{ _id: string | null; details: boolean }>({ _id: null, details: false });
 	const [sideSheetOpen, setSideSheetOpen] = useState(false);
+	const [detailOpen, setDetailOpen] = useState(false);
 
 	const onOrderAction = async (orderID: string) => {
 		if (orderID === rejectCard._id) return await orderAction(orderID, "rejectOnActive");
@@ -27,11 +29,15 @@ const ActiveOrders = (props: TActiveOrdersProps) => {
 		if (orderActive?.length === 0) {
 			setActiveCardID(undefined);
 			setActiveCardData(undefined);
+			setDetailOpen(false);
 		} else if (!orderActive.some(({ id }) => id === activeCardID)) {
 			setActiveCardID(orderActive[0]?.id);
 			setActiveCardData(orderActive[0]);
 		}
 	}, [activeCardID, orderActive]);
+
+	const rejectClass = activeCardData && rejectCard._id === activeCardData.id ? "reject " : "";
+	const detailClass = `details ${rejectClass}${detailOpen ? "open" : ""}`;
 
 	return (
 		<div className="orders">
@@ -55,11 +61,21 @@ const ActiveOrders = (props: TActiveOrdersProps) => {
 								activate={(orderID: string) => {
 									setActiveCardID(orderID);
 									setActiveCardData(orderActive.find((order) => order.id === orderID));
+									setDetailOpen(true);
 								}}
 							/>
 						))}
 					</div>
-					<div className={`details ${activeCardData && rejectCard._id === activeCardData.id ? "reject " : ""}`}>
+					<div className={detailClass}>
+						<Button
+							className="mobileBackBtn"
+							icon="f053"
+							iconType="solid"
+							size="mini"
+							type="secondary"
+							label="Back"
+							onClick={() => setDetailOpen(false)}
+						/>
 						{!activeCardData ? (
 							<NoContent label="No approved orders from this table yet!" animationName="GhostNoContent" size={200} />
 						) : (

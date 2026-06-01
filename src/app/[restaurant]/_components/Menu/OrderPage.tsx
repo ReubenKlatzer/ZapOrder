@@ -163,8 +163,26 @@ const OrderPage = () => {
 		const handleOrderRefresh = () => {
 			mutate?.();
 		};
+		const handleAddToCart = (e: Event) => {
+			const items = (e as CustomEvent<TMenuCustom[]>).detail;
+			if (!items?.length) return;
+			setSelectedProducts((prev) => {
+				const updated = [...prev];
+				items.forEach((item) => {
+					const existing = updated.find((p) => p.id === item.id);
+					if (existing) existing.quantity++;
+					else updated.push({ ...item, quantity: 1 });
+				});
+				return updated;
+			});
+			setSideSheetOpen(true);
+		};
 		window.addEventListener('orderRefresh', handleOrderRefresh);
-		return () => window.removeEventListener('orderRefresh', handleOrderRefresh);
+		window.addEventListener('add-to-cart', handleAddToCart);
+		return () => {
+			window.removeEventListener('orderRefresh', handleOrderRefresh);
+			window.removeEventListener('add-to-cart', handleAddToCart);
+		};
 	}, [mutate]);
 
 	return (

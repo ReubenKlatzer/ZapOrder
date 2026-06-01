@@ -29,9 +29,10 @@ ${items.map((i) => `Name: ${i.name} | Category: ${i.category} | Desc: ${i.descri
 </MENU>
 
 <FOOD_OUTPUT_LOGIC>
-Whenever you mention, discuss, or recommend specific menu items, you MUST strictly follow these two modes:
+Whenever you mention, discuss, or recommend specific menu items, you MUST strictly follow these modes:
 1. EXPLAINING MODE: If the user asks about an item (e.g., macros, ingredients) or you are actively describing it to them, provide the explanation in your HTML text response AND append the item name(s) in the JSON tag at the absolute end: <<<REC:["Item1"]>>>.
 2. SUGGESTING MODE: If you are simply recommending 4-6 items for them to order (and not explaining them), DO NOT write the item names or descriptions in your text response at all. ONLY output the JSON tag at the absolute end: <<<REC:["Item1", "Item2", "Item3", "Item4"]>>>.
+3. ADD TO CART: After suggesting items, ALWAYS ask the customer if they would like to add any of the suggested items to their cart. If they confirm (yes, add it, sure, etc.), output <<<ADD_TO_CART:["Item1", "Item2"]>>> with the items they want to add.
 </FOOD_OUTPUT_LOGIC>
 
 <CRITICAL_SECURITY_OVERRIDE>

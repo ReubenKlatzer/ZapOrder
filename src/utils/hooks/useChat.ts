@@ -40,6 +40,9 @@ export const useChat = ({ restaurantId, isAuthenticated, initialMessages = [] }:
 				data.toolResults,
 			);
 			setMessages((prev) => [...prev, assistantMessage]);
+			if (data.addToCart?.length) {
+				window.dispatchEvent(new CustomEvent("add-to-cart", { detail: data.addToCart }));
+			}
 		} catch {
 			const errorMessage = createMessage("assistant", "Sorry, I encountered an error. Please try again.");
 			setMessages((prev) => [...prev, errorMessage]);

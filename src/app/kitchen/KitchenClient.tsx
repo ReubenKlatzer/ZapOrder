@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+import { Icon } from "xtreme-ui";
 import "./kitchen.scss";
 
 type OrderProduct = {
@@ -18,15 +18,25 @@ type Order = {
 	table: string;
 	state: string;
 	orderTotal: number;
+	trackingStatus: string;
 	createdAt: string;
 	customer: { fname: string; lname: string; phone: string };
 	products: OrderProduct[];
 };
 
+const TRACKING_STATUSES = [
+	{ key: "placed", label: "Placed" },
+	{ key: "confirmed", label: "Confirm" },
+	{ key: "preparing", label: "Preparing" },
+	{ key: "transit", label: "On the Way" },
+	{ key: "delivered", label: "Delivered" },
+];
+
 const KitchenClient = () => {
 	const [orders, setOrders] = useState<Order[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [fulfilling, setFulfilling] = useState<string | null>(null);
+	const [updatingTracking, setUpdatingTracking] = useState<string | null>(null);
 
 	const fetchOrders = async () => {
 		const res = await fetch("/api/admin/order");
@@ -46,6 +56,16 @@ const KitchenClient = () => {
 		});
 		await fetchOrders();
 		setFulfilling(null);
+	};
+
+	const updateTracking = async (orderId: string, status: string) => {
+		setUpdatingTracking(orderId);
+		await fetch("/api/order/tracking", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ orderId, status }),
+		});
+		setUpdatingTracking(null);
 	};
 
 	useEffect(() => {
@@ -77,7 +97,7 @@ const KitchenClient = () => {
 
 			{orders.length === 0 ? (
 				<div className="kitchenEmpty">
-					<div className="kitchenEmptyIcon">🍽️</div>
+					<Icon code="f2e7" type="solid" size={48} />
 					<h2>All caught up!</h2>
 					<p>No active orders right now. New orders will appear here automatically.</p>
 				</div>
@@ -90,13 +110,13 @@ const KitchenClient = () => {
 							<div key={order.id} className={`kitchenCard ${allDone ? "done" : ""}`}>
 								<div className="kitchenCardHeader">
 									<div className="kitchenCardTable">
-										<span className="tableIcon">🪑</span>
+										<Icon code="e588" type="solid" size={16} />
 										<span>Table {order.table}</span>
 									</div>
 									<div className="kitchenCardMeta">
 										<span className="customerName">{order.customer.fname} {order.customer.lname}</span>
 										<span className={`kitchenCardStatus ${allDone ? "ready" : "cooking"}`}>
-											{allDone ? "✅ Ready" : "🔥 Cooking"}
+											{allDone ? "Ready" : "Cooking"}
 										</span>
 									</div>
 								</div>
@@ -105,7 +125,7 @@ const KitchenClient = () => {
 									{approved.map((product) => (
 										<div key={product.id} className={`kitchenItem ${product.fulfilled ? "fulfilled" : ""}`}>
 											<div className="kitchenItemInfo">
-												<span className="kitchenItemQty">×{product.quantity}</span>
+												<span className="kitchenItemQty">x{product.quantity}</span>
 												<div className="kitchenItemDetails">
 													<span className="kitchenItemName">{product.menu.name}</span>
 													{product.menu.category && <span className="kitchenItemCat">{product.menu.category}</span>}
@@ -117,7 +137,7 @@ const KitchenClient = () => {
 												disabled={product.fulfilled || fulfilling === product.id}
 												onClick={() => fulfillItem(order.id, product.id)}
 											>
-												{fulfilling === product.id ? "..." : product.fulfilled ? "Done ✓" : "Mark Done"}
+												{fulfilling === product.id ? "..." : product.fulfilled ? "Done" : "Mark Done"}
 											</button>
 										</div>
 									))}
@@ -127,7 +147,20 @@ const KitchenClient = () => {
 									<span className="kitchenCardTime">
 										{new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
 									</span>
-									<span className="kitchenCardTotal">R{order.orderTotal.toFixed(2)}</span>
+									<span className="kitchenCardTotal">R {order.orderTotal.toFixed(2)}</span>
+								</div>
+								<div className="kitchenTrackingBar">
+									{TRACKING_STATUSES.map((s) => (
+										<button
+											key={s.key}
+											type="button"
+											className={`kitchenTrackBtn ${order.trackingStatus === s.key ? "active" : ""}`}
+											disabled={updatingTracking === order.id}
+											onClick={() => updateTracking(order.id, s.key)}
+										>
+											{s.label}
+										</button>
+									))}
 								</div>
 							</div>
 						);

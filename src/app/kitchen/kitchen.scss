@@ -247,6 +247,48 @@
 			font-size: 13px;
 			opacity: 0.6;
 		}
+
+		.kitchenTrackingBar {
+			display: flex;
+			gap: 6px;
+			padding: 10px 18px;
+			border-top: 1px solid var(--colorBorderPrimary);
+			flex-wrap: wrap;
+
+			.kitchenTrackBtn {
+				flex: 1;
+				min-width: 0;
+				font-size: 11px;
+				font-weight: 600;
+				padding: 6px 4px;
+				border-radius: 8px;
+				border: 1.5px solid var(--colorBorderPrimary);
+				cursor: pointer;
+				background: var(--colorBackgroundSecondary);
+				color: var(--colorContentSecondary);
+				transition: all 0.15s;
+				text-align: center;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+
+				&:hover:not(:disabled) {
+					border-color: hsl(var(--colorTheme));
+					color: hsl(var(--colorTheme));
+				}
+
+				&.active {
+					background: hsl(var(--colorTheme));
+					border-color: hsl(var(--colorTheme));
+					color: #fff;
+				}
+
+				&:disabled {
+					opacity: 0.5;
+					cursor: default;
+				}
+			}
+		}
 	}
 }
 

@@ -22,12 +22,14 @@ export async function getChatResponse(messages: unknown[], restaurantId: string,
 
 	let text = result.text;
 	const toolResults: TMenu[][] = [];
-	const match = text.match(/<<<REC:?(.*?)>>>/);
+	let addToCart: TMenu[] = [];
 
-	if (match) {
-		text = text.replace(match[0], "").trim();
+	// Handle recommendations
+	const recMatch = text.match(/<<<REC:?(.*?)>>>/);
+	if (recMatch) {
+		text = text.replace(recMatch[0], "").trim();
 		try {
-			const names = JSON.parse(match[1]);
+			const names = JSON.parse(recMatch[1]);
 			if (Array.isArray(names)) {
 				const found = names.map((n: string) => menuMap.get(n.toLowerCase())).filter((i): i is TMenu => !!i);
 				if (found.length) toolResults.push(found);
@@ -35,5 +37,17 @@ export async function getChatResponse(messages: unknown[], restaurantId: string,
 		} catch {}
 	}
 
-	return { text, toolResults };
+	// Handle add to cart
+	const cartMatch = text.match(/<<<ADD_TO_CART:?(.*?)>>>/);
+	if (cartMatch) {
+		text = text.replace(cartMatch[0], "").trim();
+		try {
+			const names = JSON.parse(cartMatch[1]);
+			if (Array.isArray(names)) {
+				addToCart = names.map((n: string) => menuMap.get(n.toLowerCase())).filter((i): i is TMenu => !!i);
+			}
+		} catch {}
+	}
+
+	return { text, toolResults, addToCart };
 }

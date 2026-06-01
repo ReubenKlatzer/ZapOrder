@@ -42,6 +42,45 @@ const OrderDetails = ({ order, profile }: TInvoiceProps) => {
 		}
 	};
 
+	const handleDownloadCSV = () => {
+		const rows = [
+			["Order ID", "Customer", "Phone", "Table", "Date", "Subtotal", "Tax", "Grand Total"],
+			[order.id, `${order.customer?.fname} ${order.customer?.lname}`, order.customer?.phone, order.table, new Date(order.createdAt || Date.now()).toLocaleDateString(), order.orderTotal?.toFixed(2), order.taxTotal?.toFixed(2), ((order.orderTotal || 0) + (order.taxTotal || 0)).toFixed(2)],
+			[],
+			["Item", "Qty", "Price", "Total"],
+			...(order.products?.map((p) => [p.menu?.name, p.quantity, p.price?.toFixed(2), (p.price * p.quantity).toFixed(2)]) || []),
+		];
+		const csv = rows.map((r) => r.join(",")).join("\n");
+		downloadFile(csv, `Invoice-${order.id?.slice(-6).toUpperCase()}.csv`, "text/csv");
+	};
+
+	const handleDownloadTXT = () => {
+		let txt = `ORDER DETAILS\n=============\n\n`;
+		txt += `Order ID: ${order.id}\nCustomer: ${order.customer?.fname} ${order.customer?.lname}\nPhone: ${order.customer?.phone}\nTable: ${order.table}\nDate: ${new Date(order.createdAt || Date.now()).toLocaleDateString()}\n\n`;
+		txt += `ITEMS\n-----\n`;
+		order.products?.forEach((p, i) => { txt += `${i + 1}. ${p.menu?.name} x${p.quantity} - R ${(p.price * p.quantity).toFixed(2)}\n`; });
+		txt += `\nSubtotal: R ${order.orderTotal?.toFixed(2)}\nTax: R ${order.taxTotal?.toFixed(2)}\nGrand Total: R ${((order.orderTotal || 0) + (order.taxTotal || 0)).toFixed(2)}`;
+		downloadFile(txt, `Invoice-${order.id?.slice(-6).toUpperCase()}.txt`, "text/plain");
+	};
+
+	const handleDownloadWord = () => {
+		const rows = order.products?.map((p) => `<tr><td>${p.menu?.name}</td><td>x${p.quantity}</td><td>R ${p.price?.toFixed(2)}</td><td>R ${(p.price * p.quantity).toFixed(2)}</td></tr>`).join("") || "";
+		const html = `<html><body><h2>Order Invoice</h2><p><b>Order ID:</b> ${order.id}</p><p><b>Customer:</b> ${order.customer?.fname} ${order.customer?.lname}</p><p><b>Phone:</b> ${order.customer?.phone}</p><p><b>Table:</b> ${order.table}</p><p><b>Date:</b> ${new Date(order.createdAt || Date.now()).toLocaleDateString()}</p><table border="1"><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>${rows}</table><p><b>Subtotal:</b> R ${order.orderTotal?.toFixed(2)}</p><p><b>Tax:</b> R ${order.taxTotal?.toFixed(2)}</p><p><b>Grand Total:</b> R ${((order.orderTotal || 0) + (order.taxTotal || 0)).toFixed(2)}</p></body></html>`;
+		downloadFile(html, `Invoice-${order.id?.slice(-6).toUpperCase()}.doc`, "application/msword");
+	};
+
+	const downloadFile = (content: string, filename: string, type: string) => {
+		const blob = new Blob([content], { type });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement("a");
+		link.href = url;
+		link.download = filename;
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+		URL.revokeObjectURL(url);
+	};
+
 	if (!isClient) return null;
 
 	return (
@@ -54,7 +93,10 @@ const OrderDetails = ({ order, profile }: TInvoiceProps) => {
 					</div>
 				</div>
 				<div className="actions">
-					<Button icon="f019" type="primary" className="actionBtn" onClick={handleDownload} disabled={instance.loading || !instance.url} />
+					<Button icon="f019" type="primary" className="actionBtn" onClick={handleDownload} disabled={instance.loading || !instance.url} label="PDF" />
+					<Button icon="f1c3" type="secondary" className="actionBtn" onClick={handleDownloadCSV} label="Excel" />
+					<Button icon="f1c2" type="secondary" className="actionBtn" onClick={handleDownloadWord} label="Word" />
+					<Button icon="f15c" type="secondary" className="actionBtn" onClick={handleDownloadTXT} label="TXT" />
 					<Button icon="f02f" type="secondary" className="actionBtn" onClick={handlePrint} disabled={instance.loading || !instance.url} />
 				</div>
 			</div>

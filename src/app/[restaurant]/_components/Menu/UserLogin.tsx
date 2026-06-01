@@ -89,7 +89,7 @@ const phoneNumber = `+${dialCode}${phone}`;
 				</span>
 			</div>
 			<div className="content">
-				<div style={{ display: "flex", alignItems: "center", gap: 8, width: "100%" }}>
+				<div className="phoneContainer">
 					<span style={{ fontWeight: 600, fontSize: 15, whiteSpace: "nowrap" }}>🇿🇦 +27</span>
 					<Textfield
 						id="user-login-phone"

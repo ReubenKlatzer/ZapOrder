@@ -110,17 +110,20 @@ model Customer {
 }
 
 model Order {
-  id           String         @id @default(cuid())
-  restaurantID String
-  table        String
-  state        String         @default("active")
-  orderTotal   Float          @default(0)
-  taxTotal     Float          @default(0)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  customerId   String
-  products     OrderProduct[]
-  customer     Customer       @relation(fields: [customerId], references: [id])
+  id                String         @id @default(cuid())
+  restaurantID      String
+  table             String
+  state             String         @default("active")
+  trackingStatus    String         @default("placed") // placed, confirmed, preparing, transit, delivered
+  estimatedTime     Int?           // estimated time in minutes
+  orderTotal        Float          @default(0)
+  taxTotal          Float          @default(0)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  customerId        String
+  products          OrderProduct[]
+  customer          Customer       @relation(fields: [customerId], references: [id])
+  trackingHistory   OrderTracking[]
 
   @@map("orders")
 }
@@ -158,4 +161,28 @@ model Review {
   createdAt    DateTime @default(now())
 
   @@map("reviews")
+}
+
+model OrderTracking {
+  id        String   @id @default(cuid())
+  orderId   String
+  status    String   // placed, confirmed, preparing, transit, delivered
+  message   String?
+  createdAt DateTime @default(now())
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  @@map("order_tracking")
+}
+
+model MealSuggestion {
+  id           String   @id @default(cuid())
+  restaurantID String
+  customerName String
+  phone        String
+  mealName     String
+  description  String?
+  status       String   @default("pending") // pending, reviewed, added
+  createdAt    DateTime @default(now())
+
+  @@map("meal_suggestions")
 }

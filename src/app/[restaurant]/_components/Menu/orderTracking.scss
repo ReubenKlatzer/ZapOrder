@@ -1,0 +1,98 @@
+.orderTracking {
+	padding: 16px;
+	background: var(--colorBackgroundSecondary);
+	border-radius: 12px;
+	margin-bottom: 12px;
+
+	.trackingTitle {
+		font-size: 13px;
+		font-variation-settings: 'wdth' 75, 'wght' 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--colorContentSecondary);
+		margin: 0 0 8px;
+	}
+
+	.trackingEta {
+		font-size: 13px;
+		color: var(--colorContentSecondary);
+		margin: 0 0 16px;
+
+		strong {
+			color: var(--colorContentPrimary);
+		}
+	}
+
+	.trackingSteps {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		position: relative;
+
+		.trackingStep {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			flex: 1;
+			position: relative;
+
+			.stepIcon {
+				width: 36px;
+				height: 36px;
+				border-radius: 50%;
+				background: var(--colorBackgroundPrimary);
+				border: 2px solid var(--colorContentTertiary);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 16px;
+				transition: all 0.3s ease;
+				position: relative;
+				z-index: 1;
+			}
+
+			.stepLabel {
+				font-size: 10px;
+				text-align: center;
+				margin: 6px 0 0;
+				color: var(--colorContentTertiary);
+				font-variation-settings: 'wdth' 75, 'wght' 400;
+			}
+
+			.stepLine {
+				position: absolute;
+				top: 18px;
+				left: 50%;
+				width: 100%;
+				height: 2px;
+				background: var(--colorContentTertiary);
+				z-index: 0;
+				transition: background 0.3s ease;
+
+				&.done {
+					background: hsl(var(--colorBrandPrimary));
+				}
+			}
+
+			&.done {
+				.stepIcon {
+					border-color: hsl(var(--colorBrandPrimary));
+					background: hsl(var(--colorBrandPrimary) / 0.1);
+				}
+
+				.stepLabel {
+					color: var(--colorContentPrimary);
+					font-variation-settings: 'wdth' 75, 'wght' 500;
+				}
+			}
+
+			&.active {
+				.stepIcon {
+					border-color: hsl(var(--colorBrandPrimary));
+					background: hsl(var(--colorBrandPrimary));
+					box-shadow: 0 0 0 4px hsl(var(--colorBrandPrimary) / 0.2);
+				}
+			}
+		}
+	}
+}
