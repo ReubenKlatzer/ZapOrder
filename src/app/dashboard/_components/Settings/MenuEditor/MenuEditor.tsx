@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, type UIEvent, useRef, useState } from "react";
+import { type ChangeEvent, type UIEvent, useRef, useState, useCallback } from "react";
 
 import { toast } from "react-toastify";
 import { Button, Icon, Spinner, Textfield } from "xtreme-ui";
@@ -27,6 +27,7 @@ const MenuEditor = () => {
 	const [newCategory, setNewCategory] = useState("");
 	const [categoryLoading, setCategoryLoading] = useState(false);
 
+	const fileInputRef = useRef<HTMLInputElement>(null);
 	const categories = useRef<HTMLDivElement>(null);
 	const [leftCategoryScroll, setLeftCategoryScroll] = useState(false);
 	const [rightCategoryScroll, setRightCategoryScroll] = useState(true);
@@ -144,6 +145,15 @@ const MenuEditor = () => {
 		setAiGenerating(false);
 	};
 
+	const onFileChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = () => setForm((f) => ({ ...f, image: reader.result as string }));
+		reader.readAsDataURL(file);
+		e.target.value = "";
+	}, []);
+
 	const closeModal = (v: boolean) => { setModalOpen(v); if (!v) setForm(emptyForm); };
 
 	if (profileLoading) return <Spinner fullpage label="Loading Menu..." />;
@@ -182,7 +192,14 @@ const MenuEditor = () => {
 						<option value="extra-spicy">Extra Spicy</option>
 						<option value="sweet">Sweet</option>
 					</select>
-					<Textfield placeholder="Image URL (optional)" value={form.image} onChange={set("image")} />
+					<div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+						<Textfield placeholder="Image URL (optional)" value={form.image} onChange={set("image")} />
+						<input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={onFileChange} />
+						<Button icon="f03e" iconType="solid" size="mini" type="secondary" label="Upload" onClick={() => fileInputRef.current?.click()} />
+					</div>
+					{form.image?.startsWith("data:") && (
+						<img src={form.image} alt="preview" style={{ width: 80, height: 80, objectFit: "cover", borderRadius: 10 }} />
+					)}
 					<Button label={form._id ? "Update" : "Add Item"} onClick={onSave} loading={saving} />
 				</div>
 			</Modal>
