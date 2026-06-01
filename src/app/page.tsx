@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { themeController } from "xtreme-ui";
 
 import { DashboardProvider } from "#components/context";
@@ -18,7 +19,7 @@ export default async function Homepage() {
 	const color = (await getThemeColor()) ?? DEFAULT_THEME_COLOR;
 	return (
 		<DashboardProvider>
-			<script dangerouslySetInnerHTML={{ __html: themeController({ color }) }} suppressHydrationWarning />
+			<Script id="theme-controller" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeController({ color }) }} />
 			<JsonLd
 				data={{
 					"@context": "https://schema.org",

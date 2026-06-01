@@ -1,5 +1,6 @@
 /* eslint-disable react/no-danger */
 import type { ReactNode } from "react";
+import Script from "next/script";
 
 import { themeController } from "xtreme-ui";
 
@@ -13,7 +14,7 @@ export default async function DashboardLayout({ children }: IRootProps) {
 	const themeColor = await getThemeColor();
 	return (
 		<>
-			<script dangerouslySetInnerHTML={{ __html: themeController({ color: themeColor }) }} suppressHydrationWarning />
+			<Script id="theme-controller" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeController({ color: themeColor }) }} />
 			{children}
 		</>
 	);

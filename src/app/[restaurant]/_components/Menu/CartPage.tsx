@@ -36,7 +36,9 @@ const CartPage = (props: TCartPageProps) => {
 		}
 
 		if (props.selectedProducts.length === 0) {
-			// return endOrder();
+			// TODO: Implement payment/checkout flow
+			alert("Payment feature coming soon! For now, your order has been placed.");
+			return;
 		}
 
 		await placeOrder(selectedProducts);
@@ -152,7 +154,7 @@ const CartPage = (props: TCartPageProps) => {
 									? "close"
 									: props.selectedProducts.length > 0
 										? `R ${selectionTotal} | ${order?.products?.length ? "Add to order" : "Place order"}`
-										: "Proceed to Pay"
+										: order?.products?.length ? "Proceed to Pay" : "Cart is empty"
 							}
 							loading={placingOrder}
 							onClick={onOrderAction}
