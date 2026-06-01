@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "xtreme-ui";
+import QRCode from "qrcode";
 import "./paymentModal.scss";
 
 type PaymentModalProps = {
@@ -13,107 +14,137 @@ type PaymentModalProps = {
 };
 
 const PaymentModal = ({ isOpen, onClose, orderTotal, taxTotal, onPaymentComplete }: PaymentModalProps) => {
-	const [paymentMethod, setPaymentMethod] = useState<"card" | "upi" | "cash">("card");
+	const [paymentMethod, setPaymentMethod] = useState<"qr" | "cash">("qr");
 	const [processing, setProcessing] = useState(false);
+	const [qrCode, setQrCode] = useState("");
+	const [countdown, setCountdown] = useState(0);
 
 	if (!isOpen) return null;
 
 	const grandTotal = orderTotal + taxTotal;
 
+	useEffect(() => {
+		if (isOpen && paymentMethod === "qr") {
+			// Generate QR code for UPI payment
+			const upiString = `upi://pay?pa=restaurant@upi&pn=ZapOrder&am=${grandTotal}&cu=ZAR&tn=Order Payment`;
+			QRCode.toDataURL(upiString, { width: 250, margin: 2 })
+				.then(setQrCode)
+				.catch(console.error);
+		}
+	}, [isOpen, paymentMethod, grandTotal]);
+
+	useEffect(() => {
+		if (countdown > 0) {
+			const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+			return () => clearTimeout(timer);
+		}
+		if (countdown === 0 && processing) {
+			onPaymentComplete();
+			onClose();
+			setProcessing(false);
+		}
+	}, [countdown, processing, onPaymentComplete, onClose]);
+
 	const handlePayment = async () => {
 		setProcessing(true);
-		// Simulate payment processing
-		await new Promise((resolve) => setTimeout(resolve, 2000));
-		setProcessing(false);
-		onPaymentComplete();
-		onClose();
+		setCountdown(3); // 3 second countdown
 	};
 
 	return (
 		<div className="paymentModalOverlay" onClick={onClose}>
-			<div className="paymentModal" onClick={(e) => e.stopPropagation()}>
-				<div className="modalHeader">
-					<h3>Complete Payment</h3>
-					<button className="closeBtn" onClick={onClose}>×</button>
+			<div className="paymentModalNew" onClick={(e) => e.stopPropagation()}>
+				<button className="closeBtn" onClick={onClose} aria-label="Close">×</button>
+				
+				<div className="paymentHeader">
+					<h2>Complete Payment</h2>
+					<div className="totalAmount">
+						<span className="currency">R</span>
+						<span className="amount">{grandTotal.toFixed(2)}</span>
+					</div>
 				</div>
 
-				<div className="modalBody">
-					<div className="billSummary">
-						<div className="summaryRow">
-							<span>Subtotal</span>
-							<span className="rupee">R {orderTotal}</span>
-						</div>
-						<div className="summaryRow">
-							<span>Tax</span>
-							<span className="rupee">R {taxTotal}</span>
-						</div>
-						<hr />
-						<div className="summaryRow total">
-							<span>Total Amount</span>
-							<span className="rupee">R {grandTotal}</span>
-						</div>
+				<div className="paymentBody">
+					<div className="methodTabs">
+						<button
+							className={`methodTab ${paymentMethod === "qr" ? "active" : ""}`}
+							onClick={() => setPaymentMethod("qr")}>
+							<i className="fa fa-qrcode" />
+							<span>Scan & Pay</span>
+						</button>
+						<button
+							className={`methodTab ${paymentMethod === "cash" ? "active" : ""}`}
+							onClick={() => setPaymentMethod("cash")}>
+							<i className="fa fa-money-bill-wave" />
+							<span>Pay at Counter</span>
+						</button>
 					</div>
 
-					<div className="paymentMethods">
-						<h4>Select Payment Method</h4>
-						<div className="methodOptions">
-							<button
-								className={`methodBtn ${paymentMethod === "card" ? "active" : ""}`}
-								onClick={() => setPaymentMethod("card")}>
-								<i className="fa fa-credit-card" />
-								<span>Card</span>
-							</button>
-							<button
-								className={`methodBtn ${paymentMethod === "upi" ? "active" : ""}`}
-								onClick={() => setPaymentMethod("upi")}>
-								<i className="fa fa-mobile" />
-								<span>UPI</span>
-							</button>
-							<button
-								className={`methodBtn ${paymentMethod === "cash" ? "active" : ""}`}
-								onClick={() => setPaymentMethod("cash")}>
-								<i className="fa fa-money-bill" />
-								<span>Cash</span>
-							</button>
-						</div>
-					</div>
-
-					{paymentMethod === "card" && (
-						<div className="paymentForm">
-							<input type="text" placeholder="Card Number" defaultValue="4242 4242 4242 4242" />
-							<div className="formRow">
-								<input type="text" placeholder="MM/YY" defaultValue="12/25" />
-								<input type="text" placeholder="CVV" defaultValue="123" />
+					{paymentMethod === "qr" && (
+						<div className="qrPayment">
+							{qrCode && (
+								<div className="qrCodeContainer">
+									<img src={qrCode} alt="Payment QR Code" className="qrCode" />
+									<p className="qrInstruction">Scan with any UPI app</p>
+								</div>
+							)}
+							<div className="paymentApps">
+								<span className="appLabel">Supported apps:</span>
+								<div className="appIcons">
+									<span className="appIcon">📱 Banking App</span>
+									<span className="appIcon">💳 Card</span>
+									<span className="appIcon">💰 Wallet</span>
+								</div>
 							</div>
 						</div>
 					)}
 
-					{paymentMethod === "upi" && (
-						<div className="paymentForm">
-							<input type="text" placeholder="UPI ID" defaultValue="demo@upi" />
+					{paymentMethod === "cash" && (
+						<div className="cashPayment">
+							<div className="cashIcon">💵</div>
+							<h3>Pay at Counter</h3>
+							<p>Please proceed to the counter to complete your payment</p>
+							<div className="orderNumber">
+								<span>Order Total</span>
+								<strong>R {grandTotal.toFixed(2)}</strong>
+							</div>
 						</div>
 					)}
 
-					{paymentMethod === "cash" && (
-						<div className="cashNote">
-							<p>💵 Please pay at the counter</p>
+					<div className="billBreakdown">
+						<div className="breakdownRow">
+							<span>Subtotal</span>
+							<span>R {orderTotal.toFixed(2)}</span>
 						</div>
-					)}
+						<div className="breakdownRow">
+							<span>Tax</span>
+							<span>R {taxTotal.toFixed(2)}</span>
+						</div>
+						<div className="breakdownRow total">
+							<span>Total</span>
+							<span>R {grandTotal.toFixed(2)}</span>
+						</div>
+					</div>
 
 					<div className="demoNotice">
 						🎭 Demo Mode - No real payment will be processed
 					</div>
 				</div>
 
-				<div className="modalFooter">
-					<Button type="secondary" size="mini" label="Cancel" onClick={onClose} />
-					<Button
-						type="primary"
-						size="mini"
-						label={processing ? "Processing..." : `Pay R ${grandTotal}`}
-						loading={processing}
-						onClick={handlePayment}
-					/>
+				<div className="paymentFooter">
+					{processing && countdown > 0 ? (
+						<div className="processingState">
+							<div className="spinner" />
+							<span>Processing payment... {countdown}s</span>
+						</div>
+					) : (
+						<Button
+							type="primary"
+							size="large"
+							label={paymentMethod === "qr" ? "I've Paid" : "Confirm Order"}
+							onClick={handlePayment}
+							className="confirmPaymentBtn"
+						/>
+					)}
 				</div>
 			</div>
 		</div>
